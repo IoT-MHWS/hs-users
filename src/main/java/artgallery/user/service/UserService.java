@@ -12,6 +12,8 @@ import artgallery.user.repository.RoleRepository;
 import artgallery.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+  @Autowired
+  private KafkaTemplate<String, EmailDTO> kafkaTemplate;
 
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
@@ -43,6 +47,7 @@ public class UserService {
         var userEntity = UserEntity.builder()
           .login(dto.getLogin())
           .password(passwordEncoder.encode(dto.getPassword()))
+          .email(dto.getEmail())
           .roles(new ArrayList<>())
           .build();
 
@@ -57,7 +62,10 @@ public class UserService {
         userRepository.save(userEntity);
         sink.next(userEntity);
 
-      }).map(entity -> new UserCreatedDTO(entity.getId(), entity.getLogin()));
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setEmail(dto.getEmail());
+        kafkaTemplate.send("email", emailDTO);
+      }).map(entity -> new UserCreatedDTO(entity.getId(), entity.getLogin(), entity.getEmail()));
   }
 
   public Mono<UserDetailsDTO> getUserDetails(ServerUserDetails userDetails) {

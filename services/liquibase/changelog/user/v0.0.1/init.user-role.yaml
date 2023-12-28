@@ -41,6 +41,11 @@ databaseChangeLog:
                   type: VARCHAR(255)
                   constraints:
                     nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
         - createTable:
             tableName: user_role
             columns:

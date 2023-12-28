@@ -26,6 +26,10 @@ public class UserEntity {
   @NotBlank(message = "must be not null")
   private String password;
 
+  @Column(name = "email", nullable = false, unique = true, length = 255)
+  @NotBlank(message = "must be not null")
+  private String email;
+
   @EqualsAndHashCode.Exclude
   @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE })
   @JoinTable(

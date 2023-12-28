@@ -14,4 +14,6 @@ public class UserCreatedDTO {
   private Long id;
   @NotNull
   private String login;
+  @NotNull
+  private String email;
 }

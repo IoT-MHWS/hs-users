@@ -23,8 +23,4 @@ public class AuthController {
     return authService.login(userDTO)
       .map(jwt -> new ResponseEntity<>(jwt, HttpStatus.OK));
   }
-
-  ;
-
-
 }
